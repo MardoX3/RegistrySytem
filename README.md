@@ -12,7 +12,7 @@ Możliwość przeglądania, edycji i usuwania osób.
 ## Lista Zmian
 v 1.0alpha - Dodawanie osob zarzadzanie osobami zawarcie malzenstwa
 ## Technologie
-Java
+Java 20
 ## Instrukcje Instalacji
 Sklonuj repozytorium: git clone https://github.com/MardoX3/RegistrySytem.git
 
