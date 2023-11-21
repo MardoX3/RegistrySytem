@@ -14,5 +14,5 @@ v 1.0alpha - Dodawanie osob zarzadzanie osobami zawarcie malzenstwa
 ## Technologie
 JAVA
 ## Instrukcje Instalacji
-Sklonuj repozytorium: git clone https://github.com/MardoX3/RegistrySystem.git
+Sklonuj repozytorium: git clone https://github.com/MardoX3/RegistrySytem.git
 
