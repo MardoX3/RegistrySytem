@@ -322,7 +322,7 @@ public class Main {
                                     System.out.println("Last name: ");
                                     for (Person persons : person) {
                                         if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
-                                            persons.setFirstName(scanner.next());
+                                            persons.setLastName(scanner.next());
                                             System.out.println("Changes have been saved");
                                             System.out.println("-------------------------------------------------------------");
                                             System.out.println(persons);
