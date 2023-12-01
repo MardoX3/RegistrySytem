@@ -1,35 +1,40 @@
 package pl.gornik;
 import pl.gornik.person.*;
 import pl.gornik.users.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 public class Main {
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<User> users = new ArrayList<>();
         List<Person> person = new ArrayList<>();
         List<Person> foundPeopleList = new ArrayList<>();
         addToList(person);
-        users.add(new User("admin", "admin",-1));
+        users.add(new Admin("admin", "admin",-1));
         System.out.println("Run the RegistrySystem");
         boolean check = true;
         while (check) {
             int choice =  getUserChoiceLogin(scanner);
             switch (choice) {
                 case (1):
-                    if (login(users)) {
+                    int id = login(users);
+                    if (id != 0) {
+
                         boolean check1 = true;
                         System.out.println("Welcome to the  System ,Please choice what do you want");
                         while (check1) {
-                            choice = getUserChoiceMainMenu(scanner);
+                            if(id < 0) {
+                                choice = getAdminChoiceMainMenu(scanner);
+                            }
+                            else choice = getUserChoiceMainMenu(scanner);
                             switch (choice) {
                                 case (1):
                                     if (confirmAction("Are you sure you want to register your child? (yes/no)")) {
                                         System.out.println("--------------------------------------------------------------");
                                         System.out.println("Child's Personal Information: ");
-                                        childRegiser(person);
+                                        childRegister(person);
                                         break;
                                     }
                                     break;
@@ -42,10 +47,18 @@ public class Main {
                                     }
                                     break;
                                 case (3):
-                                    managePersonAdmin(person,foundPeopleList);
+                                        if (id < 0) {
+                                            managePersonAdmin(person,foundPeopleList);
+                                        }
+                                        else{
+                                            managePersonUser(person,foundPeopleList,id);
+                                        }
                                     break;
                                 case(4):
-                                    registerMarried(person);
+                                    registerMarried(person,"0");
+                                    break;
+                                case(5):
+                                    diverce(person);
                                     break;
 
                 case (0):
@@ -77,7 +90,7 @@ public class Main {
 }
 
 
-    public static boolean login(List<User> users) {
+    public static int login(List<User> users) {
         Scanner scanner = new Scanner(System.in);
             System.out.println("Username:");
             String username = scanner.nextLine();
@@ -86,11 +99,12 @@ public class Main {
             for (User user : users) {
                 if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                     System.out.println("Sucsefull login");
-                    return true;
+                     int id = user.getId();
+                    return id;
                 }
             }
                 System.out.println("login failed");
-            return false;
+            return 0;
         }
     public static void register (List<User> users,List<Person> person) {
         Scanner scanner = new Scanner(System.in);
@@ -105,20 +119,15 @@ public class Main {
         gender = scanner.nextLine();
         System.out.println("ResidentalAdress:");
         residentalAdress = scanner.nextLine();
-        System.out.println("identificationNumber:");
+        System.out.println("IndentificationNumber:");
         identificationNumber = scanner.nextLine();
         System.out.println("Username:");
         String username = scanner.nextLine();
         System.out.println("Password:");
         String password = scanner.nextLine();
-        person.add(new Person(firstname, lastname, gender, residentalAdress,identificationNumber,dateOfBirth,false));
-        for (Person persons : person) {
-            if(persons.getIdentificationNumber().equals(identificationNumber)){
-                int id = persons.getId();
-                users.add(new User(username, password,id));
-            }
-        }
-        System.out.println("Sucsefull register");
+        person.add(new Person(firstname, lastname, gender, residentalAdress,identificationNumber, dateOfBirth, false));
+        users.add(new User(username, password, person.get(person.size() - 1).getId()));
+        System.out.println("Successful registration");
     }
     private static int getUserChoiceLogin(Scanner scanner) {
         int choice = -1;
@@ -140,7 +149,7 @@ public class Main {
         }
         return choice;
     }
-    private static int getUserChoiceMainMenu(Scanner scanner) {
+    private static int getAdminChoiceMainMenu(Scanner scanner) {
         int choice = -1;
         while (choice < 0) {
             System.out.println("--------------------------------------------------------------");
@@ -148,12 +157,36 @@ public class Main {
             System.out.println("2. Register Death Certificate");
             System.out.println("3. Manage personality");
             System.out.println("4. Register Marriage");
+            System.out.println("5. Divorce");
             System.out.println("0. Log out and exit");
             System.out.print("Enter your choice: ");
 
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
-                if (choice < 0 || choice > 4) {
+                if (choice < 0 || choice > 5) {
+                    System.out.println("Invalid choice. Please enter a number between 0 and 5.");
+                    choice = -1;
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next();
+            }
+        }
+        return choice;
+    }
+    private static int getUserChoiceMainMenu(Scanner scanner) {
+        int choice = -1;
+        while (choice < 0) {
+            System.out.println("--------------------------------------------------------------");
+            System.out.println("1. request for Registration of Civil Status Birth Certificates");
+            System.out.println("2. request for Register Death Certificate");
+            System.out.println("3. Manage your personality");
+            System.out.println("0. Log out and exit");
+            System.out.print("Enter your choice: ");
+
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                if (choice < 0 || choice > 3) {
                     System.out.println("Invalid choice. Please enter a number between 0 and 4.");
                     choice = -1;
                 }
@@ -163,6 +196,52 @@ public class Main {
             }
         }
         return choice;
+    }
+    public static void diverce(List<Person> person){
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the ID of the first person: ");
+        boolean check = true;
+        int id = 0;
+        int attempt = 0;
+        while (check && attempt != 3) {
+            String person1Id = scanner.next();
+            for (Person persons : person) {
+                if (persons.getIdentificationNumber() != null) {
+                    if (persons.getIdentificationNumber().equals(person1Id)) {
+                        persons.setSpouse(false);
+                        id = persons.getId();
+                        check = false;
+                    }
+                }
+            }
+            if(id == 0) {
+                System.out.println("Invalid ID plese try again");
+                attempt++;
+            }
+
+        }
+        System.out.println("Enter the ID of the twice person: ");
+        boolean check1 = true;
+        int attempt1 = 0;
+        int check2 = 0;
+        while(check1 && attempt1 != 3) {
+            String person2Id = scanner.next();
+            for (Person persons : person) {
+                if (persons.getIdentificationNumber() != null) {
+                    if (persons.getIdentificationNumber().equals(person2Id)) {
+                        persons.setSpouse(false);
+                        persons.setId(id);
+                        check1 = false;
+                        System.out.println("Successful ddiverce");
+                        check2++;
+                    }
+                }
+            }
+            if(check2 == 0) {
+                System.out.println("Invalid ID plese try again");
+                attempt1++;
+            }
+        }
     }
     private static int getUserChoiceManageMenu(Scanner scanner) {
         int choice = -1;
@@ -178,16 +257,16 @@ public class Main {
                 choice = scanner.nextInt();
                 if (choice < 0 || choice > 4) {
                     System.out.println("Invalid choice. Please enter a number between 0 and 3.");
-                    choice = -1; // Reset choice to force the user to enter a valid choice
+                    choice = -1;
                 }
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.next(); // Consume the invalid input
+                scanner.next();
             }
         }
         return choice;
     }
-    public static void registerMarried(List<Person> person) {
+    public static void registerMarried(List<Person> person,String pesel) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the ID of the first person: ");
         boolean check = true;
@@ -199,6 +278,7 @@ public class Main {
                 if (persons.getIdentificationNumber() != null) {
                     if (persons.getIdentificationNumber().equals(person1Id)) {
                         persons.setSpouse(true);
+                        pesel = person1Id;
                         id = persons.getId();
                         check = false;
                     }
@@ -217,7 +297,7 @@ public class Main {
             while(check1 && attempt1 != 3) {
                 String person2Id = scanner.next();
                 for (Person persons : person) {
-                    if (persons.getIdentificationNumber() != null) {
+                    if (persons.getIdentificationNumber() != null || !persons.getIdentificationNumber().equals(pesel)) {
                         if (persons.getIdentificationNumber().equals(person2Id)) {
                             persons.setSpouse(true);
                             persons.setId(id);
@@ -233,7 +313,7 @@ public class Main {
                 }
             }
         }
-    public static void childRegiser(List<Person> person){
+    public static void childRegister(List<Person> person){
         Scanner scanner = new Scanner(System.in);
             String firstname,lastname,gender,dateOfBirth;
             System.out.println("First name:");
@@ -244,8 +324,7 @@ public class Main {
             gender = scanner.nextLine();
             System.out.println("DateOfBirth:");
             dateOfBirth = scanner.nextLine();
-            person.add(new Person(firstname, lastname, gender,dateOfBirth,false));
-        }
+            person.add(new Person(firstname, lastname, gender,dateOfBirth,false));        }
     public static void registerDeathCertificate(List<Person> person) {
         Scanner scanner = new Scanner(System.in);
         String deceasedFirstName,deceasedLastName,deceasedGender,dateOfBirth,dateOfDeath,identificationNumber,residentalAdress;
@@ -265,7 +344,7 @@ public class Main {
         identificationNumber = scanner.nextLine();
         person.add(new Person(deceasedFirstName, deceasedLastName, deceasedGender, dateOfBirth, dateOfDeath,residentalAdress,identificationNumber,true));
     }
-    public static void managePersonAdmin(List<Person> person,List<Person> foundPeopleList){
+    public static void managePersonAdmin(List<Person> person,List<Person> foundPeopleList) {
         Scanner scanner = new Scanner(System.in);
         boolean accessGranted = false;
 
@@ -300,73 +379,161 @@ public class Main {
                 if (choice4 >= 1 && choice4 <= resultCount) {
                     boolean check = true;
                     clearConsole();
-                    System.out.println("You selected "+ foundPeopleList.get(choice4-1).getFirstName()+" "+foundPeopleList.get(choice4-1).getLastName()+" isMarried "+foundPeopleList.get(choice4-1).getSpouse()+" What you want to change ?");
+                    System.out.println("You selected " + foundPeopleList.get(choice4 - 1).getFirstName() + " " + foundPeopleList.get(choice4 - 1).getLastName() + " isMarried " + foundPeopleList.get(choice4 - 1).getSpouse() + " What you want to change ?");
                     while (check) {
-                            int choice = getUserChoiceManageMenu(scanner);
+                        int choice = getUserChoiceManageMenu(scanner);
 
-                            switch (choice) {
-                                case (1):
-                                    clearConsole();
-                                    System.out.println("First name: ");
-                                    for (Person persons : person) {
-                                        if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
-                                            persons.setFirstName(scanner.next());
-                                            System.out.println("Changes have been saved");
-                                            System.out.println("-------------------------------------------------------------");
-                                            System.out.println(persons);
-                                        }
+                        switch (choice) {
+                            case (1):
+                                clearConsole();
+                                System.out.println("First name: ");
+                                for (Person persons : person) {
+                                    if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
+                                        persons.setFirstName(scanner.next());
+                                        System.out.println("Changes have been saved");
+                                        System.out.println("-------------------------------------------------------------");
+                                        System.out.println(persons);
                                     }
-                                    break;
-                                case (2):
-                                    clearConsole();
-                                    System.out.println("Last name: ");
-                                    for (Person persons : person) {
-                                        if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
-                                            persons.setLastName(scanner.next());
-                                            System.out.println("Changes have been saved");
-                                            System.out.println("-------------------------------------------------------------");
-                                            System.out.println(persons);
-                                        }
+                                }
+                                break;
+                            case (2):
+                                clearConsole();
+                                System.out.println("Last name: ");
+                                for (Person persons : person) {
+                                    if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
+                                        persons.setLastName(scanner.next());
+                                        System.out.println("Changes have been saved");
+                                        System.out.println("-------------------------------------------------------------");
+                                        System.out.println(persons);
                                     }
-                                    break;
-                                case (3):
-                                    clearConsole();
-                                    System.out.println("Gender: ");
-                                    for (Person persons : person) {
-                                        if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
-                                            persons.setGender(scanner.next());
-                                            System.out.println("Changes have been saved");
-                                            System.out.println("-------------------------------------------------------------");
-                                            System.out.println(persons);
-                                        }
+                                }
+                                break;
+                            case (3):
+                                clearConsole();
+                                System.out.println("Gender: ");
+                                for (Person persons : person) {
+                                    if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
+                                        persons.setGender(scanner.next());
+                                        System.out.println("Changes have been saved");
+                                        System.out.println("-------------------------------------------------------------");
+                                        System.out.println(persons);
                                     }
-                                    break;
-                                case (4):
-                                    clearConsole();
-                                    System.out.println("ResidentalAdress: ");
-                                    for (Person persons : person) {
-                                        if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
-                                            persons.setResidentalAdress(scanner.next());
-                                            System.out.println("Changes have been saved");
-                                            System.out.println("-------------------------------------------------------------");
-                                            System.out.println(persons);
-                                        }
+                                }
+                                break;
+                            case (4):
+                                clearConsole();
+                                System.out.println("ResidentalAdress: ");
+                                for (Person persons : person) {
+                                    if (persons.getId() == foundPeopleList.get(choice4 - 1).getId()) {
+                                        persons.setResidentalAdress(scanner.next());
+                                        System.out.println("Changes have been saved");
+                                        System.out.println("-------------------------------------------------------------");
+                                        System.out.println(persons);
                                     }
-                                    break;
-                                case (0):
-                                    check = false;
-                                    break;
-                            }
+                                }
+                                break;
+                            case (0):
+                                check = false;
+                                break;
                         }
                     }
+                }
             }
 
             if (confirmAction("Can you exit (y/n)")) {
                 accessGranted = true;
             } else continue;
         }
-
     }
+    public static void managePersonUser(List<Person> person,List<Person> foundPeopleList,int id){
+        Scanner scanner = new Scanner(System.in);
+        boolean accessGranted = false;
+
+        while (!accessGranted) {
+            clearConsole();
+            int resultCount = 0;
+            foundPeopleList.clear();
+            for (Person persons : person) {
+                if (persons.getId() == id) {
+                    System.out.print("Person " + (resultCount + 1) + ": ");
+                    System.out.print(persons);
+                    foundPeopleList.add(persons);
+                    System.out.println();
+                    resultCount++;
+                }
+            }
+
+            if (resultCount == 0) {
+                System.out.println("Any person not found. Please try again.");
+            } else {
+                boolean check = true;
+                clearConsole();
+                System.out.println("You Personality "+ foundPeopleList.get(0).getFirstName()+" "+foundPeopleList.get(0).getLastName()+" isMarried "+foundPeopleList.get(0).getSpouse()+" What you want to change ?");
+                while (check) {
+                    int choice = getUserChoiceManageMenu(scanner);
+
+                    switch (choice) {
+                        case (1):
+                            clearConsole();
+                            System.out.println("First name: ");
+                            for (Person persons : person) {
+                                if (persons.getId() == foundPeopleList.get(0).getId()) {
+                                    persons.setFirstName(scanner.next());
+                                    System.out.println("Changes have been saved");
+                                    System.out.println("-------------------------------------------------------------");
+                                    System.out.println(persons);
+                                }
+                            }
+                            break;
+                        case (2):
+                            clearConsole();
+                            System.out.println("Last name: ");
+                            for (Person persons : person) {
+                                if (persons.getId() == foundPeopleList.get(0).getId()) {
+                                    persons.setLastName(scanner.next());
+                                    System.out.println("Changes have been saved");
+                                    System.out.println("-------------------------------------------------------------");
+                                    System.out.println(persons);
+                                }
+                            }
+                            break;
+                        case (3):
+                            clearConsole();
+                            System.out.println("Gender: ");
+                            for (Person persons : person) {
+                                if (persons.getId() == foundPeopleList.get(0).getId()) {
+                                    persons.setGender(scanner.next());
+                                    System.out.println("Changes have been saved");
+                                    System.out.println("-------------------------------------------------------------");
+                                    System.out.println(persons);
+                                }
+                            }
+                            break;
+                        case (4):
+                            clearConsole();
+                            System.out.println("ResidentalAdress: ");
+                            for (Person persons : person) {
+                                if (persons.getId() == foundPeopleList.get(0).getId()) {
+                                    persons.setResidentalAdress(scanner.next());
+                                    System.out.println("Changes have been saved");
+                                    System.out.println("-------------------------------------------------------------");
+                                    System.out.println(persons);
+                                }
+                            }
+                            break;
+                        case (0):
+                            check = false;
+                            break;
+                    }
+                }
+            }
+
+            if (confirmAction("Can you exit (y/n)")) {
+                accessGranted = true;
+            } else continue;
+        }
+    }
+
     private static boolean confirmAction(String message) {
         Scanner scanner = new Scanner(System.in);
         System.out.println(message);

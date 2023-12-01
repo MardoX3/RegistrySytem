@@ -1,5 +1,6 @@
 package pl.gornik.person;
 
+
 public class Person {
     private String firstName;
     private String lastName;
@@ -67,7 +68,6 @@ public class Person {
         this.isDeath = isDeath;
 
     }
-
     private static synchronized int generujUnikalneId() {
         return ++lastAssignedId;
     }
