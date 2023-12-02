@@ -8,7 +8,7 @@ Możliwość elektronicznej rejestracji urodzeń, małżeństw i zgonów.
 Automatyczne generowanie indetifikatorów.
 Możliwość przeglądania, edycji osób.
 ## Lista Zmian
-v 1.0alpha - Dodawanie osob zarzadzanie osobami zawarcie malzenstwa.
+v 1.0alpha - Dodawanie osob zarzadzanie osobami zawarcie malzenstwa.<br />
 v 2.0 - Usprawnienia zwiazane z panelem użytkownika i zarządania danymi.
 ## Technologie
 Java 20
