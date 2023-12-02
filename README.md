@@ -15,3 +15,4 @@ Java 20
 ## Instrukcje Instalacji
 Sklonuj repozytorium: git clone https://github.com/MardoX3/RegistrySytem.git
 
+
