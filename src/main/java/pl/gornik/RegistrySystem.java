@@ -320,7 +320,7 @@ public class RegistrySystem {
                 }
             }
         }
-    public static void childRegister(List<Person> person,List<BirthAct> birthActs){
+    public static void childRegister(List<Person> person){
         Scanner scanner = new Scanner(System.in);
             String firstname,lastname,gender,dateOfBirth;
             System.out.println("First name:");
