@@ -1,7 +1,4 @@
 package pl.gornik;
-import pl.gornik.acts.BirthAct;
-import pl.gornik.acts.DeathAct;
-import pl.gornik.acts.MarriageAct;
 import pl.gornik.person.*;
 import pl.gornik.users.*;
 import java.util.ArrayList;
@@ -13,9 +10,6 @@ public class RegistrySystem {
         Scanner scanner = new Scanner(System.in);
         List<User> users = new ArrayList<>();
         List<Person> person = new ArrayList<>();
-        List<BirthAct> birthActs = new ArrayList<>();
-        List<DeathAct> deathActs = new ArrayList<>();
-        List<MarriageAct> marriageActs = new ArrayList<>();
         List<Person> foundPeopleList = new ArrayList<>();
         addToList(person);
         users.add(new Admin("admin", "admin",-1));
@@ -40,7 +34,7 @@ public class RegistrySystem {
                                     if (confirmAction("Are you sure you want to register your child? (yes/no)")) {
                                         System.out.println("--------------------------------------------------------------");
                                         System.out.println("Child's Personal Information: ");
-                                        childRegister(person);
+                                        childRegister(person,id);
                                         break;
                                     }
                                     break;
@@ -48,7 +42,7 @@ public class RegistrySystem {
                                     if (confirmAction("Are you sure you want to register Death Certificate? (yes/no)")) {
                                         System.out.println("--------------------------------------------------------------");
                                         System.out.println("Register Death Certificate");
-                                        registerDeathCertificate(person);
+                                        registerDeathCertificate(person,id);
                                         break;
                                     }
                                     break;
@@ -320,7 +314,7 @@ public class RegistrySystem {
                 }
             }
         }
-    public static void childRegister(List<Person> person){
+    public static void childRegister(List<Person> person,int id){
         Scanner scanner = new Scanner(System.in);
             String firstname,lastname,gender,dateOfBirth;
             System.out.println("First name:");
@@ -331,9 +325,11 @@ public class RegistrySystem {
             gender = scanner.nextLine();
             System.out.println("DateOfBirth:");
             dateOfBirth = scanner.nextLine();
-            person.add(new Person(firstname, lastname, gender,dateOfBirth,false));
+        if(id > 0) {System.out.println("Your request is being considered");}
+        else System.out.println("Successful register child");
+        person.add(new Person(firstname, lastname, gender,dateOfBirth,false));
     }
-    public static void registerDeathCertificate(List<Person> person) {
+    public static void registerDeathCertificate(List<Person> person,int id) {
         Scanner scanner = new Scanner(System.in);
         String deceasedFirstName,deceasedLastName,deceasedGender,dateOfBirth,dateOfDeath,identificationNumber,residentalAdress;
         System.out.println("First name:");
@@ -350,6 +346,8 @@ public class RegistrySystem {
         residentalAdress = scanner.nextLine();
         System.out.println("identificationNumber:");
         identificationNumber = scanner.nextLine();
+        if(id > 0){System.out.println("Your request is being considered");}
+        else System.out.println("Successful register deathCertification");
         person.add(new Person(deceasedFirstName, deceasedLastName, deceasedGender, dateOfBirth, dateOfDeath,residentalAdress,identificationNumber,true));
     }
     public static void managePersonAdmin(List<Person> person,List<Person> foundPeopleList) {
