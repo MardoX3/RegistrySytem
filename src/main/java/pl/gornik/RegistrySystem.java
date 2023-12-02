@@ -1,15 +1,21 @@
 package pl.gornik;
+import pl.gornik.acts.BirthAct;
+import pl.gornik.acts.DeathAct;
+import pl.gornik.acts.MarriageAct;
 import pl.gornik.person.*;
 import pl.gornik.users.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-public class Main {
+public class RegistrySystem {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<User> users = new ArrayList<>();
         List<Person> person = new ArrayList<>();
+        List<BirthAct> birthActs = new ArrayList<>();
+        List<DeathAct> deathActs = new ArrayList<>();
+        List<MarriageAct> marriageActs = new ArrayList<>();
         List<Person> foundPeopleList = new ArrayList<>();
         addToList(person);
         users.add(new Admin("admin", "admin",-1));
@@ -232,10 +238,11 @@ public class Main {
                         persons.setSpouse(false);
                         persons.setId(id);
                         check1 = false;
-                        System.out.println("Successful ddiverce");
+                        System.out.println("Successful diverce");
                         check2++;
                     }
                 }
+
             }
             if(check2 == 0) {
                 System.out.println("Invalid ID plese try again");
@@ -313,7 +320,7 @@ public class Main {
                 }
             }
         }
-    public static void childRegister(List<Person> person){
+    public static void childRegister(List<Person> person,List<BirthAct> birthActs){
         Scanner scanner = new Scanner(System.in);
             String firstname,lastname,gender,dateOfBirth;
             System.out.println("First name:");
@@ -324,7 +331,8 @@ public class Main {
             gender = scanner.nextLine();
             System.out.println("DateOfBirth:");
             dateOfBirth = scanner.nextLine();
-            person.add(new Person(firstname, lastname, gender,dateOfBirth,false));        }
+            person.add(new Person(firstname, lastname, gender,dateOfBirth,false));
+    }
     public static void registerDeathCertificate(List<Person> person) {
         Scanner scanner = new Scanner(System.in);
         String deceasedFirstName,deceasedLastName,deceasedGender,dateOfBirth,dateOfDeath,identificationNumber,residentalAdress;
